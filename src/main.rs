@@ -2962,6 +2962,7 @@ impl ApplicationHandler<AppEvent> for App {
                     let width = size.width as usize;
                     let height = size.height as usize;
                     let metrics = Metrics::new(self.state.font_size, self.state.line_height);
+                    let mut scratch_buf = Buffer::new(&mut self.state.font_system, metrics);
 
                     // Mode 1: Running interactive command (sl, btop, agy, etc.)
                     if let Some(cmd) = &self.state.running_command {
@@ -3036,8 +3037,7 @@ impl ApplicationHandler<AppEvent> for App {
 
                                 if !spans.is_empty() {
                                     let avail_width = (width as f32 - (PAD_X * 2.0)).max(10.0);
-                                    let mut line_buf = Buffer::new(&mut self.state.font_system, metrics);
-                                    line_buf.set_size(Some(avail_width), None);
+                                    scratch_buf.set_size(Some(avail_width), None);
 
                                     let default_attrs = Attrs::new().family(Family::Name("Estedad"));
                                     let spans_refs: Vec<(&str, Attrs)> = spans
@@ -3045,9 +3045,9 @@ impl ApplicationHandler<AppEvent> for App {
                                         .map(|(txt, col)| (txt.as_str(), default_attrs.clone().color(*col)))
                                         .collect();
 
-                                    line_buf.set_rich_text(spans_refs, &default_attrs, Shaping::Advanced, Some(Align::Right));
+                                    scratch_buf.set_rich_text(spans_refs, &default_attrs, Shaping::Advanced, Some(Align::Right));
                                     gpu.draw_buffer(
-                                        &mut line_buf,
+                                        &mut scratch_buf,
                                         PAD_X,
                                         y_pos,
                                         Color::rgb(220, 230, 242),
@@ -3059,7 +3059,7 @@ impl ApplicationHandler<AppEvent> for App {
                                         let elapsed_ms = self.state.start_time.elapsed().as_millis();
                                         if (elapsed_ms / 500) % 2 == 0 {
                                             let mut min_glyph_x = f32::INFINITY;
-                                            for run in line_buf.layout_runs() {
+                                            for run in scratch_buf.layout_runs() {
                                                 for g in run.glyphs.iter() {
                                                     if g.x < min_glyph_x {
                                                         min_glyph_x = g.x;
@@ -3159,17 +3159,16 @@ impl ApplicationHandler<AppEvent> for App {
                                     }
 
                                     let span_x = PAD_X + (start_col as f32) * cell_w;
-                                    let mut span_buf = Buffer::new(&mut self.state.font_system, metrics);
-                                    span_buf.set_size(None, None);
+                                    scratch_buf.set_size(None, None);
 
                                     let weight = if span_bold { Weight::BOLD } else { Weight::NORMAL };
                                     let attrs = Attrs::new()
                                         .family(Family::Name("CaskaydiaCove Nerd Font Mono"))
                                         .weight(weight)
                                         .color(span_fg);
-                                    span_buf.set_text(trimmed, &attrs, Shaping::Advanced, Some(Align::Left));
+                                    scratch_buf.set_text(trimmed, &attrs, Shaping::Advanced, Some(Align::Left));
                                     gpu.draw_buffer(
-                                        &mut span_buf,
+                                        &mut scratch_buf,
                                         span_x,
                                         y_pos,
                                         span_fg,
@@ -3273,14 +3272,13 @@ impl ApplicationHandler<AppEvent> for App {
                         if y_offset + entry_height > 0.0 && y_offset < (height as f32) {
                             match entry {
                                 HistoryEntry::Persian { text, color, .. } => {
-                                    let mut line_buf = Buffer::new(&mut self.state.font_system, metrics);
-                                    line_buf.set_size(Some(avail_width), None);
-                                    line_buf.set_wrap(Wrap::Glyph);
+                                    scratch_buf.set_size(Some(avail_width), None);
+                                    scratch_buf.set_wrap(Wrap::Glyph);
 
                                     let attrs = Attrs::new().family(Family::Name("Estedad"));
-                                    line_buf.set_text(text, &attrs, Shaping::Advanced, Some(Align::Right));
+                                    scratch_buf.set_text(text, &attrs, Shaping::Advanced, Some(Align::Right));
                                     gpu.draw_buffer(
-                                        &mut line_buf,
+                                        &mut scratch_buf,
                                         PAD_X,
                                         y_offset,
                                         *color,
@@ -3298,14 +3296,13 @@ impl ApplicationHandler<AppEvent> for App {
                                             if is_block_element(ch) {
                                                 if !text_run.is_empty() {
                                                     let span_x = PAD_X + (run_start_col as f32) * cell_w;
-                                                    let mut span_buf = Buffer::new(&mut self.state.font_system, metrics);
-                                                    span_buf.set_size(None, None);
+                                                    scratch_buf.set_size(None, None);
                                                     let attrs = Attrs::new()
                                                         .family(Family::Name("CaskaydiaCove Nerd Font Mono"))
                                                         .color(*span_fg);
-                                                    span_buf.set_text(&text_run, &attrs, Shaping::Advanced, Some(Align::Left));
+                                                    scratch_buf.set_text(&text_run, &attrs, Shaping::Advanced, Some(Align::Left));
                                                     gpu.draw_buffer(
-                                                        &mut span_buf,
+                                                        &mut scratch_buf,
                                                         span_x,
                                                         y_offset,
                                                         *span_fg,
@@ -3338,14 +3335,13 @@ impl ApplicationHandler<AppEvent> for App {
 
                                         if !text_run.is_empty() {
                                             let span_x = PAD_X + (run_start_col as f32) * cell_w;
-                                            let mut span_buf = Buffer::new(&mut self.state.font_system, metrics);
-                                            span_buf.set_size(None, None);
+                                            scratch_buf.set_size(None, None);
                                             let attrs = Attrs::new()
                                                 .family(Family::Name("CaskaydiaCove Nerd Font Mono"))
                                                 .color(*span_fg);
-                                            span_buf.set_text(&text_run, &attrs, Shaping::Advanced, Some(Align::Left));
+                                            scratch_buf.set_text(&text_run, &attrs, Shaping::Advanced, Some(Align::Left));
                                             gpu.draw_buffer(
-                                                &mut span_buf,
+                                                &mut scratch_buf,
                                                 span_x,
                                                 y_offset,
                                                 *span_fg,
