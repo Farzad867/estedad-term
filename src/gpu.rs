@@ -351,12 +351,31 @@ impl GpuRenderer {
             .create_surface(window)
             .expect("Failed to create Vulkan surface");
 
-        let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
-            power_preference: wgpu::PowerPreference::HighPerformance,
-            compatible_surface: Some(&surface),
-            force_fallback_adapter: false,
-        }))
-        .expect("Failed to find supported Vulkan GPU adapter");
+        let adapter = if let Ok(target) = std::env::var("ESTEDAD_GPU") {
+            let target_lower = target.to_lowercase();
+            instance
+                .enumerate_adapters(wgpu::Backends::VULKAN)
+                .into_iter()
+                .find(|a| {
+                    let name = a.get_info().name.to_lowercase();
+                    name.contains(&target_lower)
+                })
+                .unwrap_or_else(|| {
+                    pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
+                        power_preference: wgpu::PowerPreference::HighPerformance,
+                        compatible_surface: Some(&surface),
+                        force_fallback_adapter: false,
+                    }))
+                    .expect("Failed to find supported Vulkan GPU adapter")
+                })
+        } else {
+            pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
+                power_preference: wgpu::PowerPreference::HighPerformance,
+                compatible_surface: Some(&surface),
+                force_fallback_adapter: false,
+            }))
+            .expect("Failed to find supported Vulkan GPU adapter")
+        };
 
         let adapter_info = adapter.get_info();
         println!(
