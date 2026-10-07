@@ -161,13 +161,21 @@ struct PersianAlias {
 }
 
 const PERSIAN_COMMANDS: &[PersianAlias] = &[
-    // Multi-word / compound phrases
+    // Multi-word / compound phrases (3 words)
+    PersianAlias { persian: "پی دبلیو دی", english: "pwd" },
+    PersianAlias { persian: "پی‌دبلیودی", english: "pwd" },
+    PersianAlias { persian: "ای جی وای", english: "agy" },
+    PersianAlias { persian: "ای‌جی‌وای", english: "agy" },
+    PersianAlias { persian: "سیستم سی تی ال", english: "systemctl" },
+    PersianAlias { persian: "سیستم‌سی‌تی‌ال", english: "systemctl" },
+    PersianAlias { persian: "ژورنال سی تی ال", english: "journalctl" },
+    PersianAlias { persian: "ژورنال‌سی‌تی‌ال", english: "journalctl" },
+
+    // Multi-word phrases (2 words)
     PersianAlias { persian: "ال اس", english: "ls --color=auto" },
     PersianAlias { persian: "ال‌اس", english: "ls --color=auto" },
     PersianAlias { persian: "بی تاپ", english: "btop" },
     PersianAlias { persian: "بی‌تاپ", english: "btop" },
-    PersianAlias { persian: "پی دبلیو دی", english: "pwd" },
-    PersianAlias { persian: "پی‌دبلیودی", english: "pwd" },
     PersianAlias { persian: "میک دیر", english: "mkdir -p" },
     PersianAlias { persian: "میک‌دیر", english: "mkdir -p" },
     PersianAlias { persian: "آر ام", english: "rm" },
@@ -177,35 +185,88 @@ const PERSIAN_COMMANDS: &[PersianAlias] = &[
     PersianAlias { persian: "سی‌پی", english: "cp" },
     PersianAlias { persian: "ام وی", english: "mv" },
     PersianAlias { persian: "ام‌وی", english: "mv" },
-    PersianAlias { persian: "ای جی وای", english: "agy" },
-    PersianAlias { persian: "ای‌جی‌وای", english: "agy" },
     PersianAlias { persian: "اس ال", english: "sl" },
     PersianAlias { persian: "اس‌ال", english: "sl" },
-
-    // Fingilish single-word commands
-    PersianAlias { persian: "سیدی", english: "cd" },
+    PersianAlias { persian: "سی دی", english: "cd" },
     PersianAlias { persian: "سی‌دی", english: "cd" },
-    PersianAlias { persian: "زی", english: "cd" },
-    PersianAlias { persian: "کلیر", english: "clear" },
+    PersianAlias { persian: "پاور آف", english: "poweroff" },
+    PersianAlias { persian: "شات دان", english: "shutdown -h now" },
+    PersianAlias { persian: "من کیم", english: "whoami" },
+    PersianAlias { persian: "نام هاست", english: "hostname" },
+    PersianAlias { persian: "ای پی", english: "ip" },
+    PersianAlias { persian: "آی پی", english: "ip" },
+    PersianAlias { persian: "آی‌پی", english: "ip" },
+    PersianAlias { persian: "دی ان اف", english: "dnf" },
+    PersianAlias { persian: "دی‌ان‌اف", english: "dnf" },
+
+    // Single-word Fingilish & system tools
+    PersianAlias { persian: "سودو", english: "sudo" },
     PersianAlias { persian: "نانو", english: "nano" },
     PersianAlias { persian: "کت", english: "cat" },
+    PersianAlias { persian: "ویم", english: "vim" },
+    PersianAlias { persian: "وی‌آی", english: "vi" },
     PersianAlias { persian: "گیت", english: "git" },
+    PersianAlias { persian: "کلیر", english: "clear" },
+    PersianAlias { persian: "سیدی", english: "cd" },
+    PersianAlias { persian: "زی", english: "cd" },
+    PersianAlias { persian: "پکمن", english: "pacman" },
+    PersianAlias { persian: "اپت", english: "apt" },
+    PersianAlias { persian: "کارگو", english: "cargo" },
+    PersianAlias { persian: "داکر", english: "docker" },
     PersianAlias { persian: "پایتون", english: "python" },
+    PersianAlias { persian: "پایتون۳", english: "python3" },
     PersianAlias { persian: "پینگ", english: "ping" },
-    PersianAlias { persian: "سودو", english: "sudo" },
     PersianAlias { persian: "بتاپ", english: "btop" },
     PersianAlias { persian: "تاپ", english: "top" },
     PersianAlias { persian: "اسلیپ", english: "sleep" },
-    PersianAlias { persian: "کارگو", english: "cargo" },
-    PersianAlias { persian: "داکر", english: "docker" },
     PersianAlias { persian: "کد", english: "code" },
     PersianAlias { persian: "اجی", english: "agy" },
     PersianAlias { persian: "کیل", english: "kill" },
     PersianAlias { persian: "اگزیت", english: "exit" },
     PersianAlias { persian: "اگسیت", english: "exit" },
-    PersianAlias { persian: "ویم", english: "vim" },
-    PersianAlias { persian: "وی‌آی", english: "vi" },
     PersianAlias { persian: "راست", english: "rustc" },
+    PersianAlias { persian: "ایکو", english: "echo" },
+    PersianAlias { persian: "ریبوت", english: "reboot" },
+    PersianAlias { persian: "ری‌بوت", english: "reboot" },
+    PersianAlias { persian: "پاورآف", english: "poweroff" },
+
+    // Git subcommands & development verbs
+    PersianAlias { persian: "استاتوس", english: "status" },
+    PersianAlias { persian: "کامیت", english: "commit" },
+    PersianAlias { persian: "پوش", english: "push" },
+    PersianAlias { persian: "پول", english: "pull" },
+    PersianAlias { persian: "برنچ", english: "branch" },
+    PersianAlias { persian: "شاخه", english: "branch" },
+    PersianAlias { persian: "چکاوت", english: "checkout" },
+    PersianAlias { persian: "چک‌اوت", english: "checkout" },
+    PersianAlias { persian: "دیف", english: "diff" },
+    PersianAlias { persian: "کلون", english: "clone" },
+    PersianAlias { persian: "اد", english: "add" },
+    PersianAlias { persian: "ریست", english: "reset" },
+    PersianAlias { persian: "مرج", english: "merge" },
+    PersianAlias { persian: "لاگ", english: "log" },
+
+    // Service & package actions
+    PersianAlias { persian: "ریستارت", english: "restart" },
+    PersianAlias { persian: "ری‌استارت", english: "restart" },
+    PersianAlias { persian: "استارت", english: "start" },
+    PersianAlias { persian: "استاپ", english: "stop" },
+    PersianAlias { persian: "اینستال", english: "install" },
+    PersianAlias { persian: "نصب", english: "install" },
+    PersianAlias { persian: "آپدیت", english: "update" },
+    PersianAlias { persian: "اپدیت", english: "update" },
+    PersianAlias { persian: "بروزرسانی", english: "update" },
+    PersianAlias { persian: "آپگرید", english: "upgrade" },
+    PersianAlias { persian: "اپگرید", english: "upgrade" },
+    PersianAlias { persian: "ارتقا", english: "upgrade" },
+    PersianAlias { persian: "سرچ", english: "search" },
+    PersianAlias { persian: "جستجو", english: "search" },
+    PersianAlias { persian: "بیلد", english: "build" },
+    PersianAlias { persian: "ساختن", english: "build" },
+    PersianAlias { persian: "ران", english: "run" },
+    PersianAlias { persian: "اجرا", english: "run" },
+    PersianAlias { persian: "تست", english: "test" },
+    PersianAlias { persian: "چک", english: "check" },
 
     // Semantic Persian words
     PersianAlias { persian: "برو", english: "cd" },
@@ -222,6 +283,11 @@ const PERSIAN_COMMANDS: &[PersianAlias] = &[
     PersianAlias { persian: "ویرایش", english: "nano" },
     PersianAlias { persian: "مسیر", english: "pwd" },
     PersianAlias { persian: "خروج", english: "exit" },
+    PersianAlias { persian: "تاریخ", english: "date" },
+    PersianAlias { persian: "کی‌ام", english: "whoami" },
+    PersianAlias { persian: "هاست‌نیم", english: "hostname" },
+    PersianAlias { persian: "کپی", english: "cp" },
+    PersianAlias { persian: "انتقال", english: "mv" },
 ];
 
 fn persian_char_to_qwerty(c: char) -> Option<char> {
@@ -240,23 +306,34 @@ fn persian_char_to_qwerty(c: char) -> Option<char> {
         'چ' => Some(']'),
         'ش' => Some('a'),
         'س' => Some('s'),
-        'ی' | 'ئ' => Some('d'),
+        'ی' | 'ئ' | 'ي' => Some('d'),
         'ب' => Some('f'),
         'ل' => Some('g'),
-        'ا' | 'آ' => Some('h'),
+        'ا' | 'آ' | 'أ' | 'إ' => Some('h'),
         'ت' => Some('j'),
         'ن' => Some('k'),
         'م' => Some('l'),
-        'ک' => Some(';'),
+        'ک' | 'ك' => Some(';'),
         'گ' => Some('\''),
         'ظ' => Some('z'),
         'ط' => Some('x'),
-        'ز' | 'ژ' => Some('c'),
+        'ز' => Some('c'),
+        'ژ' => Some('C'),
         'ر' => Some('v'),
         'ذ' => Some('b'),
         'د' => Some('n'),
         'پ' => Some('m'),
         'و' => Some(','),
+        'ة' => Some('j'),
+        'ؤ' => Some('w'),
+        'ء' => Some('m'),
+        '؛' => Some(';'),
+        '،' => Some(','),
+        '«' => Some('<'),
+        '»' => Some('>'),
+        '؟' => Some('?'),
+        '÷' => Some('/'),
+        'ـ' => Some('_'),
         _ => None,
     }
 }
@@ -280,66 +357,359 @@ fn normalize_persian_digits(s: &str) -> String {
         .collect()
 }
 
+fn normalize_persian_input(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            '۰' | '٠' => '0',
+            '۱' | '١' => '1',
+            '۲' | '٢' => '2',
+            '۳' | '٣' => '3',
+            '۴' | '٤' => '4',
+            '۵' | '٥' => '5',
+            '۶' | '٦' => '6',
+            '۷' | '٧' => '7',
+            '۸' | '٨' => '8',
+            '۹' | '٩' => '9',
+            '٫' => '.',
+            '؛' => ';',
+            other => other,
+        })
+        .collect()
+}
+
+fn is_command_wrapper(cmd: &str) -> bool {
+    matches!(
+        cmd,
+        "sudo" | "doas" | "env" | "time" | "nohup" | "xargs" | "exec" | "busybox"
+    )
+}
+
+fn is_known_subcommand(sub: &str) -> bool {
+    matches!(
+        sub,
+        "status"
+            | "commit"
+            | "push"
+            | "pull"
+            | "branch"
+            | "checkout"
+            | "diff"
+            | "clone"
+            | "add"
+            | "reset"
+            | "merge"
+            | "log"
+            | "fetch"
+            | "rebase"
+            | "tag"
+            | "stash"
+            | "remote"
+            | "show"
+            | "init"
+            | "start"
+            | "stop"
+            | "restart"
+            | "reload"
+            | "enable"
+            | "disable"
+            | "mask"
+            | "unmask"
+            | "install"
+            | "update"
+            | "upgrade"
+            | "search"
+            | "remove"
+            | "autoremove"
+            | "clean"
+            | "info"
+            | "build"
+            | "run"
+            | "test"
+            | "check"
+            | "bench"
+            | "new"
+            | "publish"
+            | "ps"
+            | "images"
+            | "exec"
+            | "logs"
+            | "attach"
+            | "compose"
+            | "up"
+            | "down"
+            | "list"
+            | "edit"
+            | "delete"
+            | "create"
+            | "help"
+            | "version"
+    )
+}
+
+fn is_executable_command(cmd: &str) -> bool {
+    if matches!(
+        cmd,
+        "cd" | "exit" | "clear" | "echo" | "printf" | "export" | "set" | "unset"
+            | "alias" | "source" | "history" | "help" | "jobs" | "fg" | "bg"
+            | "true" | "false" | "test" | "eval" | "exec" | "read" | "type"
+            | "sudo" | "doas" | "nano" | "vim" | "vi" | "cat" | "ls" | "pwd"
+            | "cp" | "mv" | "rm" | "mkdir" | "rmdir" | "touch" | "grep" | "find"
+            | "sed" | "awk" | "reboot" | "poweroff" | "shutdown" | "btop" | "htop"
+            | "top" | "ps" | "kill" | "pkill" | "systemctl" | "journalctl" | "git"
+            | "cargo" | "rustc" | "python" | "python3" | "node" | "npm" | "docker"
+            | "pacman" | "apt" | "dnf" | "ping" | "curl" | "wget" | "ssh" | "ip"
+            | "df" | "du" | "free" | "uname" | "whoami" | "hostname" | "sl" | "agy"
+            | "code"
+    ) {
+        return true;
+    }
+    std::path::Path::new(&format!("/usr/bin/{}", cmd)).exists()
+        || std::path::Path::new(&format!("/bin/{}", cmd)).exists()
+        || std::path::Path::new(&format!("/usr/local/bin/{}", cmd)).exists()
+}
+
+fn decode_persian_token(token: &str) -> Option<String> {
+    if !token.chars().any(is_persian_char) {
+        return None;
+    }
+    let mut decoded = String::new();
+    for c in token.chars() {
+        if c == '\u{200C}' {
+            continue;
+        }
+        if c.is_ascii() {
+            decoded.push(c);
+        } else if let Some(q) = persian_char_to_qwerty(c) {
+            decoded.push(q);
+        } else {
+            return None;
+        }
+    }
+    if decoded.is_empty() {
+        None
+    } else {
+        Some(decoded)
+    }
+}
+
+fn parse_tokens(s: &str) -> Vec<(String, bool)> {
+    let mut tokens = Vec::new();
+    let chars: Vec<char> = s.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        while i < chars.len() && chars[i].is_whitespace() {
+            i += 1;
+        }
+        if i >= chars.len() {
+            break;
+        }
+        let quote_char = chars[i];
+        if quote_char == '"' || quote_char == '\'' {
+            let mut val = String::new();
+            val.push(quote_char);
+            i += 1;
+            while i < chars.len() && chars[i] != quote_char {
+                val.push(chars[i]);
+                i += 1;
+            }
+            if i < chars.len() && chars[i] == quote_char {
+                val.push(quote_char);
+                i += 1;
+            }
+            tokens.push((val, true));
+        } else {
+            let mut val = String::new();
+            while i < chars.len() && !chars[i].is_whitespace() && chars[i] != '"' && chars[i] != '\'' {
+                val.push(chars[i]);
+                i += 1;
+            }
+            tokens.push((val, false));
+        }
+    }
+    tokens
+}
+
+fn translate_single_command(cmd: &str) -> String {
+    let trimmed = cmd.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+
+    // Exact match for entire command phrase
+    for alias in PERSIAN_COMMANDS {
+        if trimmed == alias.persian {
+            return alias.english.to_string();
+        }
+    }
+
+    let raw_tokens = parse_tokens(trimmed);
+    if raw_tokens.is_empty() {
+        return String::new();
+    }
+
+    let mut translated_tokens: Vec<String> = Vec::new();
+    let mut i = 0;
+    let mut is_in_echo = false;
+
+    while i < raw_tokens.len() {
+        if is_in_echo {
+            translated_tokens.push(raw_tokens[i].0.clone());
+            i += 1;
+            continue;
+        }
+
+        if raw_tokens[i].1 {
+            // Quoted token: preserved verbatim
+            translated_tokens.push(raw_tokens[i].0.clone());
+            i += 1;
+            continue;
+        }
+
+        // Check 3-word phrase match
+        if i + 3 <= raw_tokens.len() && !raw_tokens[i + 1].1 && !raw_tokens[i + 2].1 {
+            let phrase3 = format!("{} {} {}", raw_tokens[i].0, raw_tokens[i + 1].0, raw_tokens[i + 2].0);
+            if let Some(alias) = PERSIAN_COMMANDS.iter().find(|a| a.persian == phrase3) {
+                translated_tokens.push(alias.english.to_string());
+                i += 3;
+                continue;
+            }
+        }
+
+        // Check 2-word phrase match
+        if i + 2 <= raw_tokens.len() && !raw_tokens[i + 1].1 {
+            let phrase2 = format!("{} {}", raw_tokens[i].0, raw_tokens[i + 1].0);
+            if let Some(alias) = PERSIAN_COMMANDS.iter().find(|a| a.persian == phrase2) {
+                translated_tokens.push(alias.english.to_string());
+                i += 2;
+                continue;
+            }
+        }
+
+        // Single token match against PERSIAN_COMMANDS
+        let tok = &raw_tokens[i].0;
+        if let Some(alias) = PERSIAN_COMMANDS.iter().find(|a| a.persian == tok) {
+            translated_tokens.push(alias.english.to_string());
+            if alias.english == "echo" || alias.english == "printf" {
+                is_in_echo = true;
+            }
+            i += 1;
+            continue;
+        }
+
+        // Check keyboard layout typo decoding
+        if let Some(decoded) = decode_persian_token(tok) {
+            let is_cmd_pos = translated_tokens.is_empty()
+                || is_command_wrapper(translated_tokens.last().map(|s| s.as_str()).unwrap_or(""));
+
+            let is_flag = tok.starts_with('-');
+            let is_sub = is_known_subcommand(&decoded);
+            let is_path = (decoded.starts_with('/') || decoded.starts_with("./") || decoded.starts_with("../"))
+                && (std::path::Path::new(&decoded).exists()
+                    || std::path::Path::new(&decoded).parent().map_or(false, |p| p.as_os_str().is_empty() || p.exists()));
+
+            if is_cmd_pos || is_flag || is_sub || is_path || is_executable_command(&decoded) {
+                if decoded == "echo" || decoded == "printf" {
+                    is_in_echo = true;
+                }
+                translated_tokens.push(decoded);
+                i += 1;
+                continue;
+            }
+        }
+
+        // Unmatched token (e.g. Persian arguments, filenames)
+        translated_tokens.push(tok.clone());
+        i += 1;
+    }
+
+    let mut result = translated_tokens.join(" ");
+
+    // Auto-color for ls command
+    if result == "ls" {
+        result = "ls --color=auto".to_string();
+    } else if result.starts_with("ls ") && !result.contains("--color") {
+        result = format!("ls --color=auto {}", &result[3..]);
+    } else if result == "sudo ls" {
+        result = "sudo ls --color=auto".to_string();
+    } else if result.starts_with("sudo ls ") && !result.contains("--color") {
+        result = format!("sudo ls --color=auto {}", &result[8..]);
+    }
+
+    result
+}
+
+fn split_shell_pipeline(cmd: &str) -> Vec<(String, String)> {
+    let mut segments = Vec::new();
+    let chars: Vec<char> = cmd.chars().collect();
+    let mut i = 0;
+    let mut current_segment = String::new();
+    let mut in_single_quote = false;
+    let mut in_double_quote = false;
+
+    while i < chars.len() {
+        let c = chars[i];
+        if c == '\'' && !in_double_quote {
+            in_single_quote = !in_single_quote;
+            current_segment.push(c);
+            i += 1;
+        } else if c == '"' && !in_single_quote {
+            in_double_quote = !in_double_quote;
+            current_segment.push(c);
+            i += 1;
+        } else if !in_single_quote && !in_double_quote {
+            if c == '&' && i + 1 < chars.len() && chars[i + 1] == '&' {
+                segments.push((current_segment.trim().to_string(), "&&".to_string()));
+                current_segment.clear();
+                i += 2;
+            } else if c == '|' && i + 1 < chars.len() && chars[i + 1] == '|' {
+                segments.push((current_segment.trim().to_string(), "||".to_string()));
+                current_segment.clear();
+                i += 2;
+            } else if c == ';' {
+                segments.push((current_segment.trim().to_string(), ";".to_string()));
+                current_segment.clear();
+                i += 1;
+            } else if c == '|' {
+                segments.push((current_segment.trim().to_string(), "|".to_string()));
+                current_segment.clear();
+                i += 1;
+            } else {
+                current_segment.push(c);
+                i += 1;
+            }
+        } else {
+            current_segment.push(c);
+            i += 1;
+        }
+    }
+
+    segments.push((current_segment.trim().to_string(), String::new()));
+    segments
+}
+
 fn translate_persian_command(cmd: &str) -> String {
-    let normalized = normalize_persian_digits(cmd);
+    let normalized = normalize_persian_input(cmd);
     let trimmed = normalized.trim();
     if trimmed.is_empty() {
         return String::new();
     }
 
-    // 1. Check Fingilish and Persian aliases
-    for alias in PERSIAN_COMMANDS {
-        if trimmed == alias.persian {
-            return alias.english.to_string();
+    let segments = split_shell_pipeline(trimmed);
+    let mut out = String::new();
+
+    for (seg, op) in segments {
+        if seg.is_empty() && op.is_empty() {
+            continue;
         }
-        if let Some(rest) = trimmed.strip_prefix(alias.persian) {
-            if rest.starts_with(' ') {
-                let args = rest.trim();
-                return if args.is_empty() {
-                    alias.english.to_string()
-                } else {
-                    format!("{} {}", alias.english, args)
-                };
-            }
+        let translated_seg = translate_single_command(&seg);
+        if !op.is_empty() {
+            out.push_str(&format!("{} {} ", translated_seg, op));
+        } else {
+            out.push_str(&translated_seg);
         }
     }
 
-    // 2. Fallback: Keyboard layout typo decoding for the first token
-    let parts: Vec<&str> = trimmed.splitn(2, ' ').collect();
-    let first_token = parts[0];
-    let rest = if parts.len() > 1 { parts[1] } else { "" };
-
-    if first_token.chars().any(is_persian_char) {
-        let mut decoded = String::new();
-        let mut all_mapped = true;
-        for c in first_token.chars() {
-            if let Some(q) = persian_char_to_qwerty(c) {
-                decoded.push(q);
-            } else {
-                all_mapped = false;
-                break;
-            }
-        }
-
-        if all_mapped && !decoded.is_empty() {
-            return if rest.is_empty() {
-                decoded
-            } else {
-                format!("{} {}", decoded, rest)
-            };
-        }
-    }
-
-    // 3. Auto-color for ls command
-    if trimmed == "ls" {
-        return "ls --color=auto".to_string();
-    }
-    if trimmed.starts_with("ls ") && !trimmed.contains("--color") {
-        return format!("ls --color=auto {}", &trimmed[3..]);
-    }
-
-    // 4. No translation needed
-    trimmed.to_string()
+    out.trim().to_string()
 }
 
 fn clean_bidi_text(s: &str) -> String {
@@ -4313,6 +4683,52 @@ mod tests {
         };
         let bytes = bytemuck::bytes_of(&quad);
         assert_eq!(bytes.len(), 48);
+    }
+
+    #[test]
+    fn test_translate_persian_composite_commands() {
+        assert_eq!(translate_persian_command("سودو نانو"), "sudo nano");
+        assert_eq!(translate_persian_command("سودو نانو /etc/hosts"), "sudo nano /etc/hosts");
+        assert_eq!(translate_persian_command("سودو ال اس"), "sudo ls --color=auto");
+        assert_eq!(translate_persian_command("سودو ال اس -la"), "sudo ls --color=auto -la");
+        assert_eq!(translate_persian_command("گیت استاتوس"), "git status");
+        assert_eq!(translate_persian_command("گیت کامیت -m \"test\""), "git commit -m \"test\"");
+        assert_eq!(translate_persian_command("سودو سیستم‌سی‌تی‌ال ریستارت caddy"), "sudo systemctl restart caddy");
+        assert_eq!(translate_persian_command("میک دیر /tmp/test"), "mkdir -p /tmp/test");
+        assert_eq!(translate_persian_command("سودو پاک"), "sudo clear");
+    }
+
+    #[test]
+    fn test_translate_persian_keyboard_typos() {
+        assert_eq!(translate_persian_command("سعیخ دشدخ"), "sudo nano");
+        assert_eq!(translate_persian_command("سعیخ دشدخ /etc/hosts"), "sudo nano /etc/hosts");
+        assert_eq!(translate_persian_command("لهف سفشفعس"), "git status");
+        assert_eq!(translate_persian_command("مس"), "ls --color=auto");
+        assert_eq!(translate_persian_command("مس -مش"), "ls --color=auto -la");
+        assert_eq!(translate_persian_command("سعیخ مس -مش"), "sudo ls --color=auto -la");
+        assert_eq!(translate_persian_command("سعیخ قثذخخف"), "sudo reboot");
+        assert_eq!(translate_persian_command("زمثشق"), "clear");
+        assert_eq!(translate_persian_command("زشف /etc/os-release"), "cat /etc/os-release");
+        assert_eq!(translate_persian_command("رهپ /etc/hosts"), "vim /etc/hosts");
+        assert_eq!(translate_persian_command("زی .."), "cd ..");
+    }
+
+    #[test]
+    fn test_translate_chained_and_piped_commands() {
+        assert_eq!(translate_persian_command("سودو نانو && سودو ریبوت"), "sudo nano && sudo reboot");
+        assert_eq!(translate_persian_command("سعیخ دشدخ && سعیخ قثذخخف"), "sudo nano && sudo reboot");
+        assert_eq!(translate_persian_command("سودو نانو ; سودو ریبوت"), "sudo nano ; sudo reboot");
+        assert_eq!(translate_persian_command("سودو نانو ؛ سودو ریبوت"), "sudo nano ; sudo reboot");
+        assert_eq!(translate_persian_command("ال اس | grep foo"), "ls --color=auto | grep foo");
+    }
+
+    #[test]
+    fn test_persian_arguments_and_literals_preserved() {
+        assert_eq!(translate_persian_command("echo سلام دنیا"), "echo سلام دنیا");
+        assert_eq!(translate_persian_command("ایکو سلام دنیا"), "echo سلام دنیا");
+        assert_eq!(translate_persian_command("mkdir سلام"), "mkdir سلام");
+        assert_eq!(translate_persian_command("بساز پوشه_جدید"), "mkdir -p پوشه_جدید");
+        assert_eq!(translate_persian_command("git commit -m \"تغییرات جدید\""), "git commit -m \"تغییرات جدید\"");
     }
 }
 
