@@ -1340,7 +1340,7 @@ impl TerminalState {
 
             let p1 = MousePos { x: x1, y };
             let p2 = MousePos { x: x2, y };
-            let text = extract_mode1_selection(&cmd.parser, self.cell_width, self.line_height, p1, p2);
+            let text = extract_mode1_selection_from_screen(screen, self.cell_width, self.line_height, p1, p2);
             if !text.is_empty() {
                 copy_to_clipboard(&text);
             }
@@ -1436,7 +1436,7 @@ impl TerminalState {
             let x2 = PAD_X + (term_cols as f32) * self.cell_width;
             let p1 = MousePos { x: x1, y };
             let p2 = MousePos { x: x2, y };
-            let text = extract_mode1_selection(&cmd.parser, self.cell_width, self.line_height, p1, p2);
+            let text = extract_mode1_selection_from_screen(screen, self.cell_width, self.line_height, p1, p2);
             if !text.is_empty() {
                 copy_to_clipboard(&text);
             }
@@ -1518,22 +1518,26 @@ fn paste_from_clipboard() -> Option<String> {
     None
 }
 
-fn extract_mode1_selection(
-    parser: &Arc<Mutex<vt100::Parser>>,
+fn extract_mode1_selection_from_screen(
+    screen: &vt100::Screen,
     cell_w: f32,
     line_h: f32,
     p1: MousePos,
     p2: MousePos,
 ) -> String {
-    let p = parser.lock().unwrap();
-    let screen = p.screen();
     let (term_rows, term_cols) = screen.size();
+    if term_rows == 0 || term_cols == 0 {
+        return String::new();
+    }
 
-    let r1 = (((p1.y - PAD_Y) / line_h).floor() as i32).clamp(0, term_rows as i32 - 1) as u16;
-    let c1 = (((p1.x - PAD_X) / cell_w).floor() as i32).clamp(0, term_cols as i32 - 1) as u16;
+    let r_max = (term_rows as i32 - 1).max(0);
+    let c_max = (term_cols as i32 - 1).max(0);
 
-    let r2 = (((p2.y - PAD_Y) / line_h).floor() as i32).clamp(0, term_rows as i32 - 1) as u16;
-    let c2 = (((p2.x - PAD_X) / cell_w).floor() as i32).clamp(0, term_cols as i32 - 1) as u16;
+    let r1 = (((p1.y - PAD_Y) / line_h).floor() as i32).clamp(0, r_max) as u16;
+    let c1 = (((p1.x - PAD_X) / cell_w).floor() as i32).clamp(0, c_max) as u16;
+
+    let r2 = (((p2.y - PAD_Y) / line_h).floor() as i32).clamp(0, r_max) as u16;
+    let c2 = (((p2.x - PAD_X) / cell_w).floor() as i32).clamp(0, c_max) as u16;
 
     let ((r_start, c_start), (r_end, c_end)) = if (r1, c1) <= (r2, c2) {
         ((r1, c1), (r2, c2))
@@ -1548,15 +1552,15 @@ fn extract_mode1_selection(
         let (col_min, col_max) = if r_start == r_end {
             (c_start, c_end)
         } else if r == r_start {
-            (c_start, term_cols - 1)
+            (c_start, term_cols.saturating_sub(1))
         } else if r == r_end {
             if at_left_or_mid {
-                (0, term_cols - 1)
+                (0, term_cols.saturating_sub(1))
             } else {
                 (0, c_end)
             }
         } else {
-            (0, term_cols - 1)
+            (0, term_cols.saturating_sub(1))
         };
 
         let mut row_str = String::new();
@@ -1577,6 +1581,17 @@ fn extract_mode1_selection(
         result.push_str(trimmed);
     }
     result
+}
+
+fn extract_mode1_selection(
+    parser: &Arc<Mutex<vt100::Parser>>,
+    cell_w: f32,
+    line_h: f32,
+    p1: MousePos,
+    p2: MousePos,
+) -> String {
+    let p = parser.lock().unwrap();
+    extract_mode1_selection_from_screen(p.screen(), cell_w, line_h, p1, p2)
 }
 
 fn extract_mode2_selection(state: &mut TerminalState, p1: MousePos, p2: MousePos) -> String {
@@ -2633,11 +2648,13 @@ impl ApplicationHandler<AppEvent> for App {
                 };
                 self.state.mouse_pos = Some(pos);
                 if matches!(self.state.selection, SelectionState::Selecting { .. }) {
-                    // Smooth edge auto-scrolling when dragging near/beyond boundaries!
-                    if pos.y < PAD_Y {
-                        self.state.scroll_offset = self.state.scroll_offset.saturating_add(1);
-                    } else if pos.y > (self.state.window_height as f32 - PAD_Y) {
-                        self.state.scroll_offset = self.state.scroll_offset.saturating_sub(1);
+                    // Smooth edge auto-scrolling when dragging near/beyond boundaries (Mode 2)
+                    if self.state.running_command.is_none() {
+                        if pos.y < PAD_Y {
+                            self.state.scroll_offset = self.state.scroll_offset.saturating_add(1);
+                        } else if pos.y > (self.state.window_height as f32 - PAD_Y) {
+                            self.state.scroll_offset = self.state.scroll_offset.saturating_sub(1);
+                        }
                     }
 
                     let doc_pos = self.state.screen_to_doc_pos(pos);
@@ -3174,10 +3191,12 @@ impl ApplicationHandler<AppEvent> for App {
 
                         // Render selection highlight overlay if active in Mode 1
                         if let Some((p1, p2)) = self.state.selection.get_points(self.state.line_height) {
-                            let r1 = (((p1.y - PAD_Y) / self.state.line_height).floor() as i32).clamp(0, term_rows as i32 - 1);
-                            let c1 = (((p1.x - PAD_X) / cell_w).floor() as i32).clamp(0, term_cols as i32 - 1);
-                            let r2 = (((p2.y - PAD_Y) / self.state.line_height).floor() as i32).clamp(0, term_rows as i32 - 1);
-                            let c2 = (((p2.x - PAD_X) / cell_w).floor() as i32).clamp(0, term_cols as i32 - 1);
+                            let r_max = (term_rows as i32 - 1).max(0);
+                            let c_max = (term_cols as i32 - 1).max(0);
+                            let r1 = (((p1.y - PAD_Y) / self.state.line_height).floor() as i32).clamp(0, r_max);
+                            let c1 = (((p1.x - PAD_X) / cell_w).floor() as i32).clamp(0, c_max);
+                            let r2 = (((p2.y - PAD_Y) / self.state.line_height).floor() as i32).clamp(0, r_max);
+                            let c2 = (((p2.x - PAD_X) / cell_w).floor() as i32).clamp(0, c_max);
 
                             let ((r_start, c_start), (r_end, c_end)) = if (r1, c1) <= (r2, c2) {
                                 ((r1, c1), (r2, c2))
@@ -3191,15 +3210,15 @@ impl ApplicationHandler<AppEvent> for App {
                                 let (col_min, col_max) = if r_start == r_end {
                                     (c_start, c_end)
                                 } else if r == r_start {
-                                    (c_start, term_cols as i32 - 1)
+                                    (c_start, term_cols.saturating_sub(1) as i32)
                                 } else if r == r_end {
                                     if at_left_or_mid {
-                                        (0, term_cols as i32 - 1)
+                                        (0, term_cols.saturating_sub(1) as i32)
                                     } else {
                                         (0, c_end)
                                     }
                                 } else {
-                                    (0, term_cols as i32 - 1)
+                                    (0, term_cols.saturating_sub(1) as i32)
                                 };
 
                                 let sx = PAD_X + (col_min as f32) * cell_w;
@@ -4729,6 +4748,54 @@ mod tests {
         assert_eq!(translate_persian_command("mkdir سلام"), "mkdir سلام");
         assert_eq!(translate_persian_command("بساز پوشه_جدید"), "mkdir -p پوشه_جدید");
         assert_eq!(translate_persian_command("git commit -m \"تغییرات جدید\""), "git commit -m \"تغییرات جدید\"");
+    }
+
+    #[test]
+    fn test_mode1_select_word_and_line_no_deadlock() {
+        use winit::platform::x11::EventLoopBuilderExtX11;
+        let mut builder = EventLoop::<AppEvent>::with_user_event();
+        builder.with_any_thread(true);
+        if let Ok(event_loop) = builder.build() {
+            let proxy = event_loop.create_proxy();
+            let mut state = TerminalState::new(proxy);
+
+            let parser = Arc::new(Mutex::new(vt100::Parser::new(24, 80, 100)));
+            {
+                let mut p = parser.lock().unwrap();
+                p.process(b"btop process CPU: 45.2% memory 1200MB\r\n");
+            }
+
+            let pty_system = portable_pty::native_pty_system();
+            if let Ok(pair) = pty_system.openpty(portable_pty::PtySize { rows: 24, cols: 80, pixel_width: 0, pixel_height: 0 }) {
+                let writer = pair.master.take_writer().unwrap();
+                let master = pair.master;
+                let cmd = portable_pty::CommandBuilder::new("true");
+                if let Ok(child) = pair.slave.spawn_command(cmd) {
+                    state.running_command = Some(RunningCommand {
+                        parser,
+                        writer: Arc::new(Mutex::new(writer)),
+                        master: Arc::new(Mutex::new(master)),
+                        child: Arc::new(Mutex::new(child)),
+                    });
+
+                    // Test select_word_at (used to DEADLOCK!)
+                    let click_pos = MousePos { x: PAD_X + 15.0 * state.cell_width, y: PAD_Y + state.line_height / 2.0 };
+                    let word_pts = state.select_word_at(click_pos);
+                    assert!(word_pts.is_some(), "select_word_at should find a word");
+
+                    // Test select_line_at (used to DEADLOCK!)
+                    let line_pts = state.select_line_at(click_pos);
+                    assert!(line_pts.is_some(), "select_line_at should find a line");
+
+                    // Test rapid calls (simulating multiple clicks / drags)
+                    for _ in 0..10 {
+                        let _ = state.select_word_at(click_pos);
+                        let _ = state.select_line_at(click_pos);
+                        let _ = state.get_selected_text();
+                    }
+                }
+            }
+        }
     }
 }
 
