@@ -2144,6 +2144,7 @@ impl ApplicationHandler<AppEvent> for App {
         let win_attrs = Window::default_attributes()
             .with_title("ترمینال استعداد")
             .with_decorations(false)
+            .with_transparent(true)
             .with_inner_size(winit::dpi::LogicalSize::new(1024.0, 768.0));
 
         let win = Arc::new(event_loop.create_window(win_attrs).unwrap());

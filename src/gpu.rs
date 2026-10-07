@@ -378,10 +378,6 @@ impl GpuRenderer {
         };
 
         let adapter_info = adapter.get_info();
-        println!(
-            "🚀 [Vulkan Engine Active] GPU: \"{}\" | Driver: {:?} | Backend: {:?}",
-            adapter_info.name, adapter_info.driver_info, adapter_info.backend
-        );
 
         let (device, queue) = pollster::block_on(adapter.request_device(
             &wgpu::DeviceDescriptor {
@@ -399,8 +395,16 @@ impl GpuRenderer {
             .formats
             .iter()
             .copied()
-            .find(|f| f.is_srgb())
+            .find(|f| !f.is_srgb())
             .unwrap_or(surface_caps.formats[0]);
+
+        let alpha_mode = if surface_caps.alpha_modes.contains(&wgpu::CompositeAlphaMode::PreMultiplied) {
+            wgpu::CompositeAlphaMode::PreMultiplied
+        } else if surface_caps.alpha_modes.contains(&wgpu::CompositeAlphaMode::PostMultiplied) {
+            wgpu::CompositeAlphaMode::PostMultiplied
+        } else {
+            surface_caps.alpha_modes[0]
+        };
 
         let initial_w = width.max(1);
         let initial_h = height.max(1);
@@ -410,11 +414,16 @@ impl GpuRenderer {
             width: initial_w,
             height: initial_h,
             present_mode: wgpu::PresentMode::AutoVsync,
-            alpha_mode: surface_caps.alpha_modes[0],
+            alpha_mode,
             view_formats: vec![],
             desired_maximum_frame_latency: 2,
         };
         surface.configure(&device, &config);
+
+        println!(
+            "🚀 [Vulkan Engine Active] GPU: \"{}\" | Driver: {:?} | Format: {:?} | AlphaMode: {:?}",
+            adapter_info.name, adapter_info.driver_info, surface_format, alpha_mode
+        );
 
         // Atlas texture (2048 x 2048 RGBA8)
         let atlas_texture = device.create_texture(&wgpu::TextureDescriptor {
@@ -519,7 +528,8 @@ fn vs_main(
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let sampled = textureSample(atlas_tex, atlas_sampler, in.uv);
-    return vec4<f32>(in.color.rgb * sampled.rgb, in.color.a * sampled.a);
+    let alpha = in.color.a * sampled.a;
+    return vec4<f32>(in.color.rgb * sampled.rgb * alpha, alpha);
 }
 "#
                 .into(),
@@ -617,7 +627,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
                 entry_point: Some("fs_main"),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: surface_format,
-                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                    blend: Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
@@ -985,6 +995,26 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
                 label: Some("Terminal Render Encoder"),
             });
 
+        let is_premul = self.config.alpha_mode == wgpu::CompositeAlphaMode::PreMultiplied;
+        let is_transp = self.config.alpha_mode != wgpu::CompositeAlphaMode::Opaque;
+        let bg_a: f64 = if is_transp {
+            std::env::var("ESTEDAD_OPACITY")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(0.80)
+        } else {
+            1.0
+        };
+        let mult = if is_premul { bg_a } else { 1.0 };
+
+        // Catppuccin Mocha Dark: #1E1E2E (30, 30, 46) with smooth compositor transparency
+        let clear_color = wgpu::Color {
+            r: (30.0 / 255.0) * mult,
+            g: (30.0 / 255.0) * mult,
+            b: (46.0 / 255.0) * mult,
+            a: bg_a,
+        };
+
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Terminal Render Pass"),
@@ -992,12 +1022,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
                     view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 15.0 / 255.0,
-                            g: 17.0 / 255.0,
-                            b: 26.0 / 255.0,
-                            a: 1.0,
-                        }), // Obsidian 0xFF0F111A
+                        load: wgpu::LoadOp::Clear(clear_color),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
