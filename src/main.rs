@@ -1852,6 +1852,99 @@ fn row_is_multicolumn(screen: &vt100::Screen, row: u16, cols: u16) -> bool {
     false
 }
 
+fn cursor_col_to_byte_offset(
+    screen: &vt100::Screen,
+    row: u16,
+    cursor_col: u16,
+    term_cols: u16,
+) -> usize {
+    let mut byte_offset = 0;
+    for col in 0..cursor_col.min(term_cols) {
+        if let Some(cell) = screen.cell(row, col) {
+            if cell.is_wide_continuation() {
+                continue;
+            }
+            let content = cell.contents();
+            byte_offset += if content.is_empty() { 1 } else { content.len() };
+        } else {
+            byte_offset += 1;
+        }
+    }
+    byte_offset
+}
+
+fn find_buffer_cursor_x(
+    buf: &Buffer,
+    cursor_byte_target: usize,
+    total_bytes: usize,
+    cell_w: f32,
+) -> f32 {
+    for run in buf.layout_runs() {
+        if run.glyphs.is_empty() {
+            return 0.0;
+        }
+
+        // 1. If cursor is beyond the trimmed text in buffer
+        if cursor_byte_target > total_bytes {
+            let extra_bytes = cursor_byte_target - total_bytes;
+            let end_byte = total_bytes.saturating_sub(1);
+            if let Some(last_char_g) = run.glyphs.iter().find(|g| g.start <= end_byte && end_byte < g.end) {
+                return if last_char_g.level.is_rtl() {
+                    last_char_g.x - (extra_bytes as f32) * cell_w
+                } else {
+                    (last_char_g.x + last_char_g.w) + (extra_bytes as f32) * cell_w
+                };
+            } else if let Some(last_g) = run.glyphs.last() {
+                return if last_g.level.is_rtl() {
+                    last_g.x - (extra_bytes as f32) * cell_w
+                } else {
+                    (last_g.x + last_g.w) + (extra_bytes as f32) * cell_w
+                };
+            }
+        }
+
+        // 2. Cursor is at byte 0 (start of the line)
+        if cursor_byte_target == 0 {
+            if let Some(g) = run.glyphs.iter().find(|g| g.start == 0 || (g.start <= 0 && 0 < g.end)) {
+                return if g.level.is_rtl() {
+                    g.x + g.w
+                } else {
+                    g.x
+                };
+            }
+        }
+
+        // 3. Cursor is at byte > 0
+        let prev_byte = cursor_byte_target.saturating_sub(1);
+        if let Some(g) = run.glyphs.iter().find(|g| g.start <= prev_byte && prev_byte < g.end) {
+            return if g.level.is_rtl() {
+                g.x
+            } else {
+                g.x + g.w
+            };
+        }
+
+        // 4. Fallback: check if any glyph starts at cursor_byte_target
+        if let Some(g) = run.glyphs.iter().find(|g| g.start >= cursor_byte_target) {
+            return if g.level.is_rtl() {
+                g.x + g.w
+            } else {
+                g.x
+            };
+        }
+
+        // 5. Ultimate fallback: last glyph boundary
+        if let Some(last_g) = run.glyphs.last() {
+            return if last_g.level.is_rtl() {
+                last_g.x
+            } else {
+                last_g.x + last_g.w
+            };
+        }
+    }
+    0.0
+}
+
 fn cell_colors(cell: &vt100::Cell) -> (Color, Option<Color>) {
     let raw_fg = cell.fgcolor();
     let raw_bg = cell.bgcolor();
@@ -3056,25 +3149,18 @@ impl ApplicationHandler<AppEvent> for App {
                                     );
 
                                     if r_idx == cursor_row && !hide_cursor {
-                                        let elapsed_ms = self.state.start_time.elapsed().as_millis();
-                                        if (elapsed_ms / 500) % 2 == 0 {
-                                            let mut min_glyph_x = f32::INFINITY;
-                                            for run in scratch_buf.layout_runs() {
-                                                for g in run.glyphs.iter() {
-                                                    if g.x < min_glyph_x {
-                                                        min_glyph_x = g.x;
-                                                    }
-                                                }
-                                            }
-                                            let cur_x_pos = if min_glyph_x.is_infinite() {
-                                                (width as f32) - PAD_X - 10.0
-                                            } else {
-                                                PAD_X + min_glyph_x - 6.0
-                                            };
-                                            let cx = cur_x_pos.max(4.0).min(width as f32 - 10.0);
-                                            let cy = y_pos + 4.0;
-                                            gpu.push_rect_hex_alpha(cx, cy, 4.0, 22.0, 0x82AAFF, 255);
-                                        }
+                                        let target_byte_offset = cursor_col_to_byte_offset(&screen, r_idx, cursor_col, term_cols);
+                                        let total_text_bytes: usize = spans.iter().map(|(txt, _)| txt.len()).sum();
+                                        let local_x = find_buffer_cursor_x(
+                                            &scratch_buf,
+                                            target_byte_offset,
+                                            total_text_bytes,
+                                            cell_w,
+                                        );
+                                        let cur_x_pos = PAD_X + local_x - 2.0;
+                                        let cx = cur_x_pos.max(4.0).min(width as f32 - 10.0);
+                                        let cy = y_pos + 4.0;
+                                        gpu.push_rect_hex_alpha(cx, cy, 4.0, 22.0, 0x82AAFF, 255);
                                     }
                                 }
                                 continue;
@@ -4553,11 +4639,86 @@ mod tests {
         let runs: Vec<_> = line_buf.layout_runs().collect();
         assert_eq!(runs.len(), 1);
         let run = &runs[0];
-        println!("run line_w: {:.1}, glyphs: {}", run.line_w, run.glyphs.len());
-        let min_x = run.glyphs.iter().map(|g| g.x).fold(f32::INFINITY, f32::min);
         let max_x = run.glyphs.iter().map(|g| g.x + g.w).fold(f32::NEG_INFINITY, f32::max);
-        println!("min_x: {:.1}, max_x: {:.1}", min_x, max_x);
         assert!(max_x > avail_width - 10.0, "Right-aligned text should reach the right margin! max_x={:.1}", max_x);
+    }
+
+    #[test]
+    fn test_mode1_cursor_following_persian_and_mixed() {
+        let mut font_system = FontSystem::new();
+        let estedad_paths = [
+            "/usr/share/fonts/TTF/Estedad-Regular.ttf",
+            "/usr/share/fonts/TTF/Estedad-Medium.ttf",
+            "/usr/share/fonts/TTF/Estedad-Bold.ttf",
+        ];
+        for path in estedad_paths {
+            if std::path::Path::new(path).exists() {
+                let _ = font_system.db_mut().load_font_file(path);
+            }
+        }
+        let metrics = Metrics::new(16.0, 24.0);
+        let avail_width = 800.0f32;
+        let cell_w = 11.0f32;
+        let default_attrs = Attrs::new().family(Family::Name("Estedad"));
+
+        // 1. Test Claude Code prompt with Persian: "❯ سلام"
+        let text_claude = "❯ سلام";
+        let mut buf_claude = Buffer::new(&mut font_system, metrics);
+        buf_claude.set_size(Some(avail_width), None);
+        buf_claude.set_text(text_claude, &default_attrs, Shaping::Advanced, Some(Align::Right));
+        buf_claude.shape_until_scroll(&mut font_system, false);
+
+        let total_bytes_claude = text_claude.len();
+        // At end of "سلام" (byte 12):
+        let cursor_x_end = find_buffer_cursor_x(&buf_claude, 12, total_bytes_claude, cell_w);
+        // Find 'م' glyph in buf_claude
+        let run = buf_claude.layout_runs().next().unwrap();
+        let meem_glyph = run.glyphs.iter().find(|g| &text_claude[g.start..g.end] == "م").unwrap();
+        assert_eq!(cursor_x_end, meem_glyph.x, "Cursor after typing 'سلام' must be directly adjacent to 'م' on the left!");
+
+        // 2. Test mixed prompt with English: "❯ test سلام"
+        // In the old implementation, min_glyph_x was placed at '❯' (far left of run),
+        // completely separated from the Persian text being typed on the right!
+        let text_mixed = "❯ test سلام";
+        let mut buf_mixed = Buffer::new(&mut font_system, metrics);
+        buf_mixed.set_size(Some(avail_width), None);
+        buf_mixed.set_text(text_mixed, &default_attrs, Shaping::Advanced, Some(Align::Right));
+        buf_mixed.shape_until_scroll(&mut font_system, false);
+
+        let total_bytes_mixed = text_mixed.len();
+        let run_mixed = buf_mixed.layout_runs().next().unwrap();
+        let prompt_g = run_mixed.glyphs.iter().find(|g| &text_mixed[g.start..g.end] == "❯").unwrap();
+        let meem_mixed_g = run_mixed.glyphs.iter().find(|g| &text_mixed[g.start..g.end] == "م").unwrap();
+
+        // Cursor at typing head (end of "سلام", byte 17):
+        let cursor_x_mixed_end = find_buffer_cursor_x(&buf_mixed, 17, total_bytes_mixed, cell_w);
+        assert_eq!(cursor_x_mixed_end, meem_mixed_g.x, "Cursor after typing Persian in mixed text must track 'م', NOT jump to prompt '❯'!");
+        assert!(cursor_x_mixed_end > prompt_g.x + 20.0, "Cursor must not jump across the line to the opposite side!");
+
+        // Cursor at byte 8 (end of "test"):
+        let cursor_x_test = find_buffer_cursor_x(&buf_mixed, 8, total_bytes_mixed, cell_w);
+        let t_glyph = run_mixed.glyphs.iter().find(|g| g.start == 7 && g.end == 8).unwrap();
+        assert_eq!(cursor_x_test, t_glyph.x + t_glyph.w, "Cursor after 'test' must follow 't' on the right!");
+
+        // 3. Test cursor_col_to_byte_offset with vt100::Screen
+        let mut parser = vt100::Parser::new(5, 80, 100);
+        // Process Claude Code prompt "❯ " and "سلام"
+        parser.process("❯ ".as_bytes());
+        parser.process("سلام".as_bytes());
+        let screen = parser.screen().clone();
+
+        // Col 0: '❯' (3 bytes)
+        // Col 1: ' ' (1 byte)
+        // Col 2: 'س' (2 bytes)
+        // Col 3: 'ل' (2 bytes)
+        // Col 4: 'ا' (2 bytes)
+        // Col 5: 'م' (2 bytes)
+        // Col 6: cursor position after typing "سلام"
+        let byte_offset_col6 = cursor_col_to_byte_offset(&screen, 0, 6, 80);
+        assert_eq!(byte_offset_col6, 12, "Col 6 must map to byte 12 (end of 'سلام')");
+
+        let byte_offset_col2 = cursor_col_to_byte_offset(&screen, 0, 2, 80);
+        assert_eq!(byte_offset_col2, 4, "Col 2 must map to byte 4 (start of Persian text after '❯ ')");
     }
 
     #[test]
