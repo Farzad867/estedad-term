@@ -2,10 +2,9 @@
 name = "estedad-term"
 version = "0.1.0"
 edition = "2024"
-authors = ["Farzad"]
 description = "High-performance GPU-accelerated Persian/BiDi terminal emulator built with Rust and Vulkan"
 readme = "README.md"
-license = "MIT"
+license = "GPL-2.0-only"
 keywords = ["terminal", "persian", "bidi", "vulkan", "gpu"]
 categories = ["command-line-utilities", "rendering"]
 repository = "https://github.com/Farzad867/estedad-term"

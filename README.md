@@ -6,7 +6,7 @@
 
 [![Rust](https://img.shields.io/badge/Rust-2024%20Edition-orange?logo=rust)](https://www.rust-lang.org/)
 [![Vulkan](https://img.shields.io/badge/Vulkan-wgpu%2024-red?logo=vulkan)](https://wgpu.rs/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Wayland%20%7C%20X11-purple)](https://wayland.freedesktop.org/)
 
 ---
@@ -81,4 +81,4 @@ cargo test
 
 ## مجوز انتشار
 
-این پروژه تحت مجوز آزاد [MIT License](LICENSE) منتشر شده است.
+این پروژه تحت مجوز آزاد [GNU General Public License v2.0 (GPLv2)](LICENSE) منتشر شده است.
