@@ -51,19 +51,19 @@ sudo pacman -S --needed vulkan-intel ttf-caskaydia-cove-nerd
 ### روش اول: اسکریپت نصب خودکار
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/farzad/estedad-term/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Farzad867/estedad-term/master/install.sh | bash
 ```
 
 ### روش دوم: نصب مستقیم با Cargo از گیت‌هاب
 
 ```bash
-cargo install --git https://github.com/farzad/estedad-term.git
+cargo install --git https://github.com/Farzad867/estedad-term.git
 ```
 
 ### روش سوم: ساخت بسته محلی در آرچ لینوکس (PKGBUILD)
 
 ```bash
-git clone https://github.com/farzad/estedad-term.git
+git clone https://github.com/Farzad867/estedad-term.git
 cd estedad-term/packaging/aur
 makepkg -si
 ```
@@ -71,7 +71,7 @@ makepkg -si
 ### روش چهارم: کامپایل دستی از روی سورس‌کد
 
 ```bash
-git clone https://github.com/farzad/estedad-term.git
+git clone https://github.com/Farzad867/estedad-term.git
 cd estedad-term
 cargo build --release
 cp target/release/estedad-term ~/.local/bin/

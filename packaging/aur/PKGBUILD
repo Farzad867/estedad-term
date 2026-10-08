@@ -4,7 +4,7 @@ pkgver=0.1.0
 pkgrel=1
 pkgdesc="High-performance GPU-accelerated Persian/BiDi terminal emulator built with Rust and Vulkan"
 arch=('x86_64')
-url="https://github.com/farzad/estedad-term"
+url="https://github.com/Farzad867/estedad-term"
 license=('MIT')
 depends=('vulkan-driver' 'wayland' 'libxkbcommon' 'ttf-font-awesome')
 optdepends=(
@@ -14,7 +14,7 @@ optdepends=(
 makedepends=('cargo' 'git')
 provides=('estedad-term')
 conflicts=('estedad-term')
-source=("${pkgname}::git+https://github.com/farzad/estedad-term.git")
+source=("${pkgname}::git+https://github.com/Farzad867/estedad-term.git")
 sha256sums=('SKIP')
 
 build() {

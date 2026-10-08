@@ -2,7 +2,7 @@
 # اسکریپت نصب استعداد ترم (Estedad Term)
 set -euo pipefail
 
-REPO="farzad/estedad-term"
+REPO="Farzad867/estedad-term"
 INSTALL_DIR="${HOME}/.local/bin"
 DESKTOP_DIR="${HOME}/.local/share/applications"
 
