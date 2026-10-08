@@ -68,11 +68,3 @@ cargo build --release
 cp target/release/estedad-term ~/.local/bin/
 cp assets/estedad-term.desktop ~/.local/share/applications/
 ```
-
----
-
-## آزمون‌ها
-
-```bash
-cargo test
-```
