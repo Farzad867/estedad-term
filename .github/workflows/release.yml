@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvulkan-dev libwayland-dev libxkbcommon-dev
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Package tarball
+        run: |
+          mkdir -p package/assets
+          cp target/release/estedad-term package/
+          cp assets/estedad-term.desktop package/assets/
+          cp README.md package/
+          cp LICENSE package/
+          tar -czf estedad-term-linux-x86_64.tar.gz -C package .
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: estedad-term-linux-x86_64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Estedad Term
+Comment=GPU-Accelerated Persian/BiDi Terminal Emulator
+Exec=estedad-term
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;
+StartupNotify=true
+StartupWMClass=estedad-term
+Keywords=terminal;persian;farsi;bidi;vulkan;

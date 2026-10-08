@@ -1,0 +1,31 @@
+# Maintainer: Farzad
+pkgname=estedad-term-git
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="High-performance GPU-accelerated Persian/BiDi terminal emulator built with Rust and Vulkan"
+arch=('x86_64')
+url="https://github.com/farzad/estedad-term"
+license=('MIT')
+depends=('vulkan-driver' 'wayland' 'libxkbcommon' 'ttf-font-awesome')
+optdepends=(
+    'vulkan-intel: Intel hardware acceleration'
+    'nvidia-utils: NVIDIA hardware acceleration'
+)
+makedepends=('cargo' 'git')
+provides=('estedad-term')
+conflicts=('estedad-term')
+source=("${pkgname}::git+https://github.com/farzad/estedad-term.git")
+sha256sums=('SKIP')
+
+build() {
+    cd "${srcdir}/${pkgname}"
+    cargo build --release --locked
+}
+
+package() {
+    cd "${srcdir}/${pkgname}"
+    install -Dm755 "target/release/estedad-term" "${pkgdir}/usr/bin/estedad-term"
+    install -Dm644 "assets/estedad-term.desktop" "${pkgdir}/usr/share/applications/estedad-term.desktop"
+    install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 "README.md" "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+}
