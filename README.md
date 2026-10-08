@@ -76,9 +76,3 @@ cp assets/estedad-term.desktop ~/.local/share/applications/
 ```bash
 cargo test
 ```
-
----
-
-## مجوز انتشار
-
-این پروژه تحت مجوز آزاد [GNU General Public License v2.0 (GPLv2)](LICENSE) منتشر شده است.
