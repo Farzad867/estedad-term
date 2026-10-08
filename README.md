@@ -33,6 +33,11 @@
 در توزیع‌های مبتنی بر آرچ (Arch / CachyOS / Manjaro):
 ```bash
 sudo pacman -S --needed vulkan-intel ttf-caskaydia-cove-nerd
+
+# نصب فونت استعداد از AUR
+yay -S ttf-estedad
+# یا
+paru -S ttf-estedad
 ```
 
 ---
