@@ -47,7 +47,7 @@ paru -S ttf-estedad
 ### روش اول: اسکریپت نصب سریع (پیشنهادی)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Farzad867/estedad-term/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Farzad867/estedad-term/main/install.sh | bash
 ```
 
 ### روش دوم: نصب مستقیم با Cargo از گیت‌هاب
