@@ -1,8 +1,6 @@
-# Estedad Term (استعداد ترم) 🚀
+# Estedad Term
 
-> **ترمینال شتاب‌یافته گرافیکی (Vulkan) با پشتیبانی بومی از زبان فارسی، تصحیح هوشمند دستورات و تم مدرن Catppuccin**
->
-> A blazing-fast, GPU-accelerated terminal emulator built in Rust with native Persian/Arabic BiDi shaping, keyboard typo correction, and Vulkan rendering.
+A GPU-accelerated terminal emulator built with Rust and Vulkan, featuring native Persian/Arabic bidirectional (BiDi) text shaping and intelligent command translation.
 
 ---
 
@@ -13,84 +11,54 @@
 
 ---
 
-## ✨ ویژگی‌های برجسته (Key Features)
+## Overview
 
-### ⚡ رندرینگ سخت‌افزاری فوق‌العاده سریع با Vulkan
-- پیاده‌سازی شده با پایپ‌لاین گرافیکی مدرن **WGSL** بر بستر **`wgpu 24`**.
-- اطلس تکسچر با ابعاد ۲۰۴۸x۲۰۴۸ برای ذخیره و رندر بدون لگ فونت‌ها با یک تک‌درخواست رسم (Single Instanced Draw Call per frame).
-- مصرف پردازنده نزدیک به صفر (0.0% CPU) در حالت بی‌کار (Idle) به لطف هماهنگی با رویدادهای Wayland/X11.
+Estedad Term is designed for Unix systems, providing native Right-to-Left (RTL) and bidirectional (BiDi) text handling alongside high-performance hardware rendering via modern Vulkan pipelines.
 
-### 🇮🇷 پشتیبانی اصیل از خط فارسی و چینش راست‌به‌چپ (BiDi)
-- حل کامل معضل حروف بریده‌بریده و معکوس در ترمینال‌های رایج لینوکس با استفاده از موتور متن **`cosmic-text`**.
-- ادغام دو فونت استاندارد: فونت فارسی زیبای **Estedad** به همراه **CaskaydiaCove Nerd Font Mono** برای آیکون‌ها و نمادهای برنامه‌نویسی.
+### Key Capabilities
 
-### 🧠 مفسر هوشمند دستورات و تبدیل خطاهای تایپی (Typo Corrector)
-- **تبدیل خطای چیدمان کیبورد:** اگر کیبورد روی فارسی بود و انگلیسی تایپ کردید، خودکار اصلاح می‌شود:
-  - `سعیخ دشدخ` ⬅️ `sudo nano`
-  - `لهف سفشفعس` ⬅️ `git status`
-  - `مس -مش` ⬅️ `ls -la`
-- **پشتیبانی از دستورات فینگلیش:**
-  - `سودو نانو` ⬅️ `sudo nano`
-  - `کلیر` ⬅️ `clear`
-- **حفظ آرگومان‌ها و مقادیر فارسی:** نام پوشه‌ها یا متن‌های فارسی تغییر نمی‌کنند:
-  - `mkdir سلام` ⬅️ پوشه‌ای با نام «سلام» ساخته می‌شود.
-- **زنجیره‌سازی دستورات ترکیبی:** پشتیبانی کامل از عملگرهای `&&`, `||`, `;`, و `|`.
-
-### 🎨 تم تیره Catppuccin Mocha و شفافیت شیشه‌ای
-- رنگ پس‌زمینه چشم‌نواز `#1E1E2E` هماهنگ با اکوسیستم مدرن لینوکس.
-- شفافیت واقعی پنجره با حالت Pre-multiplied Alpha متناسب با کامپوزیتورهای Wayland (مانند Sway و Hyprland).
-
-### 🔋 مدیریت هوشمند پردازنده گرافیکی (Dual-GPU)
-- به صورت خودکار از گرافیک کم‌مصرف (Intel iGPU) استفاده می‌کند تا شارژ باتری لپ‌تاپ بهینه بماند.
-- امکان سوییچ دستی به کارت انویدیا تنها با یک متغیر محیطی:
-  ```bash
-  ESTEDAD_GPU=nvidia estedad-term
-  ```
-
-### 🖱️ بدون فریز در برنامه‌های تعاملی (btop, htop)
-- هندلینگ بی‌درنگ ماوس و رویدادهای PTY.
-- پشتیبانی کامل از انتخاب کلمه (دابل‌کلیک)، خط (تریپل‌کلیک) و انتخاب محدوده بدون هیچ‌گونه فریز یا بن‌بست پردازشی (Deadlock-Free).
+- **Hardware Acceleration:** Built on `wgpu 24` using custom WGSL shaders and a 2048x2048 glyph texture atlas. Executes single-instanced draw calls per frame with near-zero idle CPU usage.
+- **Bidirectional Text & Shaping:** Native Persian and Arabic glyph shaping powered by `cosmic-text`. Configured with the **Estedad** font family and fallback support for **CaskaydiaCove Nerd Font Mono**.
+- **Keyboard Layout & Typo Translation:** Automatically maps Persian layout keystrokes and transliterated commands to system commands before PTY submission:
+  - Layout typos: `سعیخ دشدخ` maps to `sudo nano`, `لهف سفشفعس` maps to `git status`, `مس -مش` maps to `ls -la`.
+  - Transliterated commands: `سودو نانو` maps to `sudo nano`, `کلیر` maps to `clear`.
+  - Operator preservation: Supports pipelines and conditional operators (`&&`, `||`, `;`, `|`).
+  - Argument preservation: Unicode arguments and paths (e.g., `mkdir سلام`) remain unchanged.
+- **Compositor Integration:** Window transparency with pre-multiplied alpha designed for Wayland compositors (Sway, Hyprland) using the Catppuccin Mocha color scheme (`#1E1E2E`).
+- **Power Management:** Automatically selects low-power integrated graphics (Intel iGPU) by default to preserve battery life, with environment variable override (`ESTEDAD_GPU=nvidia`) for dedicated GPUs.
+- **Terminal Interactivity:** Non-blocking PTY handling with full mouse tracking and deadlock-free word/line selection in full-screen terminal applications (`btop`, `htop`).
 
 ---
 
-## 📦 پیش‌نیازها (Prerequisites)
+## Dependencies
 
-برای اجرای روان و بهترین تجربه، بسته‌های زیر را روی توزیع لینوکس خود داشته باشید:
+Runtime requirements:
+- Vulkan driver (`vulkan-intel`, `nvidia-utils`, or `vulkan-radeon`)
+- Fonts: `Estedad` and `CaskaydiaCove Nerd Font Mono`
+- Wayland / X11 libraries: `libwayland-client`, `libxkbcommon`
 
-- درایور Vulkan متناسب با کارت گرافیک (`vulkan-intel` یا `nvidia-utils` یا `vulkan-radeon`)
-- فونت **Estedad** و فونت مونوگیفیک کدنویسی **CaskaydiaCove Nerd Font Mono**
-- کتابخانه‌های Wayland / X11 (`libwayland-dev`, `libxkbcommon`)
-
-در آرچ / CachyOS / مانجارو:
+On Arch Linux / CachyOS:
 ```bash
 sudo pacman -S --needed vulkan-intel ttf-caskaydia-cove-nerd
 ```
 
 ---
 
-## 🛠️ نحوه نصب و ساخت (Build & Installation)
+## Installation
 
-### روش اول: نصب سریع با اسکریپت تک‌خطی (پیشنهادی)
-
-بدون نیاز به داشتن Rust یا ابزار اضافه، آخرین نسخه کامپایل شده را با یک دستور در سیستم خود نصب کنید:
+### Method 1: Automated Installer
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/farzad/estedad-term/master/install.sh | bash
 ```
 
----
-
-### روش دوم: نصب مستقیم با Cargo (از روی گیت‌هاب)
-
-اگر ابزار Rust و Cargo روی سیستم شما نصب است:
+### Method 2: Cargo (Git)
 
 ```bash
 cargo install --git https://github.com/farzad/estedad-term.git
 ```
 
----
-
-### روش سوم: نصب در توزیع‌های آرچ و CachyOS (محلی بدون نیاز به AUR)
+### Method 3: Arch Linux / AUR (Local Build)
 
 ```bash
 git clone https://github.com/farzad/estedad-term.git
@@ -98,9 +66,7 @@ cd estedad-term/packaging/aur
 makepkg -si
 ```
 
----
-
-### روش چهارم: ساخت دستی از سورس کد
+### Method 4: Manual Build from Source
 
 ```bash
 git clone https://github.com/farzad/estedad-term.git
@@ -112,37 +78,49 @@ cp assets/estedad-term.desktop ~/.local/share/applications/
 
 ---
 
-## ⚙️ تنظیم در مدیر پنجره‌ها (Window Managers)
+## Configuration
 
-### تنظیم در Sway (`~/.config/sway/config`):
+### Sway (`~/.config/sway/config`)
+
 ```sway
 bindsym $mod+Return exec ~/.local/bin/estedad-term
 ```
 
-### تنظیم در i3 (`~/.config/i3/config`):
+### i3 (`~/.config/i3/config`)
+
 ```i3
 bindsym $mod+Return exec ~/.local/bin/estedad-term
 ```
 
-### تنظیم در Hyprland (`~/.config/hypr/hyprland.conf`):
+### Hyprland (`~/.config/hypr/hyprland.conf`)
+
 ```conf
 bind = $mainMod, Return, exec, estedad-term
 ```
 
 ---
 
-## 🧪 اجرای آزمون‌ها (Running Tests)
+## Environment Variables
 
-برای اطمینان از صحت تمام بخش‌ها (رندرینگ Vulkan، ترنسلیتر دستورات، مفسر بای‌دی و رفع ددلاک‌ها):
+| Variable | Values | Description |
+|---|---|---|
+| `ESTEDAD_GPU` | `intel`, `nvidia`, `default` | Forces GPU adapter selection (default: low-power adapter). |
+| `WGPU_BACKEND` | `vulkan`, `gl` | Selects underlying graphics backend (default: Vulkan). |
+
+---
+
+## Testing
+
+Run the test suite:
 
 ```bash
 cargo test
 ```
 
-تمام ۲۱ آزمون یکپارچه بدون خطا پاس می‌شوند.
+All integration and unit tests cover text shaping, command transformation, GPU vertex generation, and PTY concurrency.
 
 ---
 
-## 📜 لایسنس (License)
+## License
 
-این پروژه تحت مجوز آزاد [MIT License](LICENSE) منتشر شده است. استفاده، ویرایش و بازنشر آن آزاد است.
+This project is licensed under the [MIT License](LICENSE).
