@@ -70,28 +70,44 @@ sudo pacman -S --needed vulkan-intel ttf-caskaydia-cove-nerd
 
 ## 🛠️ نحوه نصب و ساخت (Build & Installation)
 
-### روش اول: کامپایل از روی سورس کد (Rust)
+### روش اول: نصب سریع با اسکریپت تک‌خطی (پیشنهادی)
+
+بدون نیاز به داشتن Rust یا ابزار اضافه، آخرین نسخه کامپایل شده را با یک دستور در سیستم خود نصب کنید:
 
 ```bash
-# ۱. دریافت ریپازیتوری
-git clone https://github.com/farzad/estedad-term.git
-cd estedad-term
-
-# ۲. کامپایل نسخه بهینه (Release)
-cargo build --release
-
-# ۳. قرار دادن فایل اجرایی در مسیر سیستم
-cp target/release/estedad-term ~/.local/bin/
-
-# ۴. افزودن آیکون و میانبر به منوی برنامه‌ها
-cp assets/estedad-term.desktop ~/.local/share/applications/
+curl -fsSL https://raw.githubusercontent.com/farzad/estedad-term/master/install.sh | bash
 ```
 
-### روش دوم: نصب در توزیع‌های آرچ از طریق AUR
+---
+
+### روش دوم: نصب مستقیم با Cargo (از روی گیت‌هاب)
+
+اگر ابزار Rust و Cargo روی سیستم شما نصب است:
 
 ```bash
-cd packaging/aur
+cargo install --git https://github.com/farzad/estedad-term.git
+```
+
+---
+
+### روش سوم: نصب در توزیع‌های آرچ و CachyOS (محلی بدون نیاز به AUR)
+
+```bash
+git clone https://github.com/farzad/estedad-term.git
+cd estedad-term/packaging/aur
 makepkg -si
+```
+
+---
+
+### روش چهارم: ساخت دستی از سورس کد
+
+```bash
+git clone https://github.com/farzad/estedad-term.git
+cd estedad-term
+cargo build --release
+cp target/release/estedad-term ~/.local/bin/
+cp assets/estedad-term.desktop ~/.local/share/applications/
 ```
 
 ---
