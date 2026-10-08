@@ -67,11 +67,8 @@ info "Installation completed successfully."
 info "Binary:  $INSTALL_DIR/estedad-term"
 info "Desktop: $DESKTOP_DIR/estedad-term.desktop"
 
-case ":$PATH:" in
-    *":$INSTALL_DIR:"*) ;;
-    *)
-        printf "\nNotice: %s is not in your PATH.\n" "$INSTALL_DIR"
-        printf "Consider adding it to your shell configuration:\n"
-        printf "  export PATH=\"\$HOME/.local/bin:\$PATH\"\n\n"
-        ;;
-esac
+if ! command -v estedad-term >/dev/null 2>&1; then
+    printf "\nNotice: %s is not currently in your PATH.\n" "$INSTALL_DIR"
+    printf "Consider adding it to your shell configuration:\n"
+    printf "  export PATH=\"\$HOME/.local/bin:\$PATH\"\n\n"
+fi
